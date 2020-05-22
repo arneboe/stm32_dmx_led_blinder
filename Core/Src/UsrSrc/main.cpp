@@ -5,6 +5,8 @@
  *      Author: arne
  */
 
+#include <stdio.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -12,7 +14,7 @@ extern "C" {
 /** This is the user entry method. It is call forever from main() */
 void loop()
 {
-
+	printf("blaaa\n");
 }
 
 #ifdef __cplusplus
