@@ -2,6 +2,7 @@
 #include <cstdint>
 
 #define DMX_FRAME_SIZE 513
+#define DMX_MAX_INDEX 512
 
 /**The @p buffer remain valid forever, no need to copy anything! */
 typedef void (*DmxFrameCallback)(const uint8_t* buffer);
