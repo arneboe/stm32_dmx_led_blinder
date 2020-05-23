@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "DmxReceiver.hpp"
+#include <stm32f1xx_hal.h>
 
 void dmxFrameReceived(const uint8_t* buffer);
 
@@ -17,12 +18,19 @@ extern "C" {
 	/** This is the user entry method. It is call forever from main() */
 	void loop()
 	{
-		printf("blaaa\n");
+
 	}
 
 	void systick()
 	{
-		printf("aaa");
+		auto x = HAL_GetTick();
+
+		//update dmx address from switches
+
+		//for each effect:
+		// updateEffect(leds, dt, dmx_data);
+		//apply changes
+
 	}
 
 }
