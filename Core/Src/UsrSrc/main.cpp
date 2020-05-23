@@ -1,22 +1,36 @@
-/*
- * main.cpp
- *
- *  Created on: May 22, 2020
- *      Author: arne
- */
-
 #include <stdio.h>
+#include "DmxReceiver.hpp"
 
-#ifdef __cplusplus
+void dmxFrameReceived(const uint8_t* buffer);
+
+volatile bool frameReceived = false;
+const uint8_t* dmxBuffer = nullptr;
+
 extern "C" {
-#endif
 
-/** This is the user entry method. It is call forever from main() */
-void loop()
+	void init()
+	{
+		DmxReceiver::init(dmxFrameReceived);
+		printf("Initialized");
+	}
+
+	/** This is the user entry method. It is call forever from main() */
+	void loop()
+	{
+		printf("blaaa\n");
+	}
+
+	void systick()
+	{
+		printf("aaa");
+	}
+
+}
+
+
+void dmxFrameReceived(const uint8_t* buffer)
 {
-	printf("blaaa\n");
+	//once we get the buffer it will never change
+    dmxBuffer = buffer;
 }
 
-#ifdef __cplusplus
-}
-#endif
