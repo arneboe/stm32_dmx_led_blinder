@@ -2,11 +2,13 @@
 #include "DmxReceiver.hpp"
 #include <stm32f1xx_hal.h>
 #include "DmxCommand.hpp"
+#include "Leds.hpp"
 
 
 volatile bool frameReceived = false;
 const uint8_t* dmxBuffer = nullptr;
 DmxCommand dmxCmd;
+Leds<8> leds(); //TODO init properly
 
 void dmxFrameReceived(const uint8_t* buffer);
 uint16_t readDipSwitch();
@@ -49,6 +51,8 @@ void runDmxUpdate(const uint16_t dipSwitch, const uint8_t dtMs)
 	//+1 because the 0'th byte is in a dmx frame is reserved (the buffer is 513 bytes long).
 	const uint16_t dmxAddr = (dipSwitch & 0b111111111) + 1;
 	dmxCmd.load(dmxAddr, dmxBuffer);
+
+
 
 
 
