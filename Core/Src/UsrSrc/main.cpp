@@ -32,7 +32,8 @@ extern "C" {
 	void systick()
 	{
 		const uint16_t dip = readDipSwitch();
-		const bool dmxMode = (dip & 0b000000001) == 0;
+
+		const bool dmxMode = (dip & 0b1000000000) == 0;
 
 		if(dmxMode)
 		{
@@ -42,6 +43,7 @@ extern "C" {
 		{
 			runStaticEffect(dip, 1);
 		}
+
 	}
 
 } //end extern c
@@ -50,6 +52,7 @@ void runDmxUpdate(const uint16_t dipSwitch, const uint8_t dtMs)
 {
 	//+1 because the 0'th byte is in a dmx frame is reserved (the buffer is 513 bytes long).
 	const uint16_t dmxAddr = (dipSwitch & 0b111111111) + 1;
+	printf("dmxaddr: %d\n", dmxAddr);
 	dmxCmd.load(dmxAddr, dmxBuffer);
 
 
@@ -71,7 +74,7 @@ void runStaticEffect(const uint16_t dipSwitch, const uint8_t dtMs)
 uint16_t readDipSwitch()
 {
 	uint16_t result = 0;
-	result |= GPIOA->IDR & 0x11111111; //read GPIOA Pins 0..7
+	result = GPIOA->IDR & 0b11111111; //read GPIOA Pins 0..7
 	result |= (GPIOB->IDR & 0b11) << 8; //read GPIOB Pins 0..1
 	return result;
 }
