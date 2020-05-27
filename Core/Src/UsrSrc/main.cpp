@@ -3,12 +3,13 @@
 #include <stm32f1xx_hal.h>
 #include "DmxCommand.hpp"
 #include "Leds.hpp"
+#include "tim.h"
 
 
 volatile bool frameReceived = false;
 const uint8_t* dmxBuffer = nullptr;
 DmxCommand dmxCmd;
-Leds<8> leds(); //TODO init properly
+Leds<8> leds;
 
 void dmxFrameReceived(const uint8_t* buffer);
 uint16_t readDipSwitch();
@@ -25,14 +26,45 @@ extern "C" {
 	{
 		DmxReceiver::init(dmxFrameReceived);
 		dmxCmd.setZero();
+
+		HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+		HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
+		HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
+		HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
+		HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+		HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+		HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
+		HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
+
+		leds.init(std::array<CCRPtr, 8>{
+			&(htim1.Instance->CCR1),
+			&(htim1.Instance->CCR2),
+			&(htim1.Instance->CCR3),
+			&(htim1.Instance->CCR4),
+			&(htim2.Instance->CCR1),
+			&(htim2.Instance->CCR2),
+			&(htim3.Instance->CCR1),
+			&(htim3.Instance->CCR2)},255);
+
+
 		printf("Initialized");
 	}
 
 	void loop()
 	{
-		dmxCmd.print();
-		printf("-----------------");
-		HAL_Delay(1000);
+
+
+		static uint8_t val = 0;
+		val++;
+		leds.setAll(val);
+		leds.apply();
+
+		HAL_Delay(20);
+
+//
+//		dmxCmd.print();
+//		printf("-----------------");
+//		HAL_Delay(1000);
 //		if(gotFrame)
 //		{
 //			gotFrame=false;
@@ -50,6 +82,9 @@ extern "C" {
 
 	void systick()
 	{
+
+		//TODO think about maybe using 16 bit dmx channels instead of 8 bit.
+
 		const uint16_t dip = readDipSwitch();
 
 		const bool dmxMode = (dip & 0b1000000000) == 0;
@@ -87,8 +122,9 @@ void runDmxUpdate(const uint16_t dipSwitch, const uint8_t dtMs)
 void runStaticEffect(const uint16_t dipSwitch, const uint8_t dtMs)
 {
 	/* static effects:
-	 *
+	 * bits
 	 */
+
 	//+1 just to be consistent with dmx...
 	const uint16_t dmxAddr = (dipSwitch & 0b111111111) + 1;
 
