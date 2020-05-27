@@ -15,6 +15,10 @@ uint16_t readDipSwitch();
 void runDmxUpdate(const uint16_t dipSwitch, const uint8_t dtMs);
 void runStaticEffect(const uint16_t dipSwitch, const uint8_t dtMs);
 
+
+volatile int dmxCnt = 0;
+volatile bool gotFrame = false;
+
 extern "C" {
 
 	void init()
@@ -26,7 +30,22 @@ extern "C" {
 
 	void loop()
 	{
-
+		dmxCmd.print();
+		printf("-----------------");
+		HAL_Delay(1000);
+//		if(gotFrame)
+//		{
+//			gotFrame=false;
+//		for(int i = 1; i < 20; ++i)
+//		{
+//			printf("%d ", dmxBuffer[i]);
+//		}
+//		printf("\n");
+//
+//		printf("hz: %d\n",dmxCnt/(HAL_GetTick()/1000));
+//
+//
+//		}
 	}
 
 	void systick()
@@ -48,15 +67,14 @@ extern "C" {
 
 } //end extern c
 
+
+
+
 void runDmxUpdate(const uint16_t dipSwitch, const uint8_t dtMs)
 {
 	//+1 because the 0'th byte is in a dmx frame is reserved (the buffer is 513 bytes long).
 	const uint16_t dmxAddr = (dipSwitch & 0b111111111) + 1;
-	printf("dmxaddr: %d\n", dmxAddr);
 	dmxCmd.load(dmxAddr, dmxBuffer);
-
-
-
 
 
 	//for each effect:
@@ -68,6 +86,11 @@ void runDmxUpdate(const uint16_t dipSwitch, const uint8_t dtMs)
 /** Runs a simple static light effect based on the dipSwitchValue */
 void runStaticEffect(const uint16_t dipSwitch, const uint8_t dtMs)
 {
+	/* static effects:
+	 *
+	 */
+	//+1 just to be consistent with dmx...
+	const uint16_t dmxAddr = (dipSwitch & 0b111111111) + 1;
 
 }
 
@@ -82,7 +105,9 @@ uint16_t readDipSwitch()
 
 void dmxFrameReceived(const uint8_t* buffer)
 {
+	dmxCnt++;
 	//once we get the buffer it will never change
     dmxBuffer = buffer;
+    gotFrame = true;
 }
 

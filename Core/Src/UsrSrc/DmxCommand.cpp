@@ -54,3 +54,19 @@ void DmxCommand::setZero()
 	red[2] = 0;
 	red[3] = 0;
 }
+
+void DmxCommand::print()
+{
+	printf("master: %d\n", master);
+	printf("strob : %d\n", strobe);
+	printf("white0: %d\n", white[0]);
+	printf("white1: %d\n", white[1]);
+	printf("white2: %d\n", white[2]);
+	printf("white3: %d\n", white[3]);
+	printf("red0  : %d\n", red[0]);
+	printf("red1  : %d\n", red[1]);
+	printf("red2  : %d\n", red[2]);
+	printf("red3  : %d\n", red[3]);
+
+}
+

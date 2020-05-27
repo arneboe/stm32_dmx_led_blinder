@@ -10,5 +10,6 @@ struct DmxCommand
 
 	void load(uint16_t dmxAddr, const uint8_t* dmxData);
 	void setZero();
+	void print();
 
 };

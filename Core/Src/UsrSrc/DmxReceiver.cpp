@@ -1,5 +1,6 @@
 #include "DmxReceiver.hpp"
 #include "usart.h"
+#include <stdio.h>
 
 #define DMX_CONNECTED_TIMEOUT_MS 1000
 
@@ -27,23 +28,26 @@ bool DmxReceiver::connected() {
     return (HAL_GetTick() - lastReceivedTime) < DMX_CONNECTED_TIMEOUT_MS;
 }
 
-void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+extern "C"
 {
-    if(huart->Instance == USART3)
-    {
-        //TODO NDTR. check if we got any data at all before the error occurred. If yes we got a smaller frame which is also fine.
-        //If not dmx has been disconnected
-    	//receivedBytes = DMX_FRAME_SIZE - __HAL_DMA_GET_COUNTER(huart1.hdmarx);
-        HAL_UART_Receive_DMA(&huart3, DmxReceiver::buffer, DMX_FRAME_SIZE);
-    }
-}
+	void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+	{
 
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-    if(huart->Instance == USART3)
-    {
-        HAL_UART_Receive_DMA(&huart3, DmxReceiver::buffer, DMX_FRAME_SIZE);
-        DmxReceiver::signalFrameReceived();
-    }
-}
+		if(huart->Instance == USART3)
+		{
+			//TODO NDTR. check if we got any data at all before the error occurred. If yes we got a smaller frame which is also fine.
+			//If not dmx has been disconnected
+			//receivedBytes = DMX_FRAME_SIZE - __HAL_DMA_GET_COUNTER(huart1.hdmarx);
+			HAL_UART_Receive_DMA(&huart3, DmxReceiver::buffer, DMX_FRAME_SIZE);
+		}
+	}
 
+	void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+	{
+		if(huart->Instance == USART3)
+		{
+			HAL_UART_Receive_DMA(&huart3, DmxReceiver::buffer, DMX_FRAME_SIZE);
+			DmxReceiver::signalFrameReceived();
+		}
+	}
+}
